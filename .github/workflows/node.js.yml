@@ -22,8 +22,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: npm run pretest
+    - run: yarn install --frozen-lockfile
+    - run: yarn pretest
 
 #  build-and-publish-latest:
 #    runs-on: ubuntu-latest
