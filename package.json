@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "NODE_ENV=prod node app.js",
-    "dev": "NODE_ENV=dev nodemon app.js"
+    "dev": "NODE_ENV=dev nodemon app.js | pino-colada"
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,10 @@
   "homepage": "https://github.com/execute-it/main-server#readme",
   "dependencies": {
     "dotenv": "^8.2.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "express-pino-logger": "^5.0.0",
+    "pino": "^6.5.1",
+    "pino-colada": "^2.1.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
