@@ -8,6 +8,6 @@ COPY yarn.lock ./
 RUN yarn install
 
 COPY . .
+RUN apk add bash
 
-RUN adduser -D user
-USER user
+
