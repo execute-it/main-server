@@ -1,0 +1,14 @@
+version: "3"
+services:
+  # Django APP
+  app: &app
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/usr/src/app
+    command: >
+      sh -c "yarn start"
+    environment:
+      - NODE_ENV=prod

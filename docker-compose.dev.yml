@@ -1,0 +1,14 @@
+version: "3"
+services:
+  # Django APP
+  app: &app
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/usr/src/app
+    command: >
+      sh -c "yarn dev"
+    environment:
+      - NODE_ENV=dev

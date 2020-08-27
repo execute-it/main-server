@@ -16,7 +16,7 @@ const app = express()
 app.use(expressLogger);
 
 app.get('/', (req, res) => {
-    res.send('Hello World')
+    res.status(200).send({ error: 'something blew up' })
 })
 
 app.listen(port, () => {
