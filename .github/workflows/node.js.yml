@@ -25,17 +25,17 @@ jobs:
     - run: yarn install --frozen-lockfile
     - run: yarn pretest
 
-#  build-and-publish-latest:
-#    runs-on: ubuntu-latest
-#    if: github.ref == 'refs/heads/master' # Running this job only for master branch
-#
-#    steps:
-#      - uses: actions/checkout@v2 # Checking out the repo
-#
-#      - name: Build and Publish latest Docker image
-#        uses: VaultVulp/gp-docker-action@1.1.6
-#        with:
-#          github-token: ${{ secrets.GITHUB_TOKEN }} # Provide GITHUB_TOKEN to login into the GitHub Packages
-#          image-name: main-server # Provide only Docker image name, tag will be automatically set to latest
-#          dockerfile: Dockerfile
+  build-and-publish-latest:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' # Running this job only for master branch
+
+    steps:
+      - uses: actions/checkout@v2 # Checking out the repo
+
+      - name: Build and Publish latest Docker image
+        uses: VaultVulp/gp-docker-action@1.1.6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }} # Provide GITHUB_TOKEN to login into the GitHub Packages
+          image-name: main-server # Provide only Docker image name, tag will be automatically set to latest
+          dockerfile: Dockerfile
 
