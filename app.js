@@ -1,4 +1,4 @@
-require('dotenv').config({path: `.env.${process.env.NODE_ENV}`})
+require('dotenv').config({path: '.env.' + process.env.NODE_ENV})
 
 const express = require('express')
 const pino = require('pino');
@@ -16,7 +16,7 @@ const app = express()
 app.use(expressLogger);
 
 app.get('/', (req, res) => {
-    res.status(200).send({ error: 'something blew up' })
+    res.status(200).send({error: 'Something blew up'})
 })
 
 app.listen(port, () => {

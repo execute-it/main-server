@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "NODE_ENV=prod node app.js",
-    "dev": "NODE_ENV=dev nodemon app.js | pino-colada"
+    "dev": "NODE_ENV=dev nodemon app.js | pino-colada",
+    "pretest": "eslint --ignore-path .gitignore ."
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,8 @@
     "pino-colada": "^2.1.0"
   },
   "devDependencies": {
+    "eslint": "^7.7.0",
+    "eslint-config-strongloop": "^2.1.0",
     "nodemon": "^2.0.4"
   }
 }
