@@ -32,6 +32,25 @@ services:
       - USER_SERVER_CPU_LIMIT=10
       - USER_SERVER_MEM_LIMIT=256000
       - USER_SERVER_NETWORK=executeit
+      - MONGO_HOST=mongo
+      - MONGO_DB_NAME=executeit
+      - MONGO_USER=root
+      - MONGO_PASSWORD=example
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
 networks:
   executeit:
     external:
