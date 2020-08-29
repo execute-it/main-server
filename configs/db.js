@@ -1,6 +1,6 @@
 let mongoose = require('mongoose');
 
-const logger = require('./utils/logger')
+const logger = require('../utils/logger')
 const server = process.env.MONGO_HOST; // REPLACE WITH YOUR DB SERVER
 const database = process.env.MONGO_DB_NAME;      // REPLACE WITH YOUR DB NAME
 

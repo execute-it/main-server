@@ -36,6 +36,10 @@ services:
       - MONGO_DB_NAME=executeit
       - MONGO_USER=root
       - MONGO_PASSWORD=example
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CALLBACK_URL=/auth/google/callback
+      - EXPRESS_SESSION_SECRET=gocoronago
   mongo:
     image: mongo
     restart: always
