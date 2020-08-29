@@ -8,6 +8,7 @@ services:
       - "3000:3000"
     volumes:
       - ./:/usr/src/app
+      - /var/run/docker.sock:/var/run/docker.sock
     command: >
       sh -c "yarn start"
     environment:
