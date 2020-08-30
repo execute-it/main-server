@@ -1,12 +1,18 @@
 const express = require('express')
 const router = express.Router()
-const {ensureAuth, ensureGuest} = require('../middleware/auth')
-router.get('/',ensureGuest, (req, res) => {
-    res.send('lol')
+const passport = require('passport')
+
+router.get('/',(req, res) => {
+    res.send('<h1>lol</h1>')
 })
 
-router.get('/dashboard', ensureAuth,(req,res)=>{
-    res.send('<h1>Dashboard</h1>')
+router.get('/profile', passport.authenticate(
+    'jwt',
+    { session: false }) ,
+    (req,res)=>{
+    res.send(`THIS IS UR PROFILE MAAANNNN ${req.user.email}`)
 })
+
+
 
 module.exports = router
