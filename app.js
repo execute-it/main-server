@@ -1,4 +1,4 @@
-require('dotenv').config({path: '.env.' + process.env.NODE_ENV})
+require('dotenv').config({ path: '.env.' + process.env.NODE_ENV })
 const logger = require('./utils/logger')
 const express = require('express')
 const expressPino = require('express-pino-logger');
@@ -9,14 +9,14 @@ const cookieParser = require('cookie-parser')
 require('./configs/db.js')
 require('./configs/passport')(passport)
 
-const expressLogger = expressPino({logger});
+const expressLogger = expressPino({ logger });
 const port = parseInt(process.env.PORT)
 const app = express()
 
 app.use(expressLogger);
 app.use(cookieParser());
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(passport.initialize());
 

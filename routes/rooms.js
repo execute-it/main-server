@@ -1,30 +1,26 @@
 const express = require('express')
 const router = express.Router()
-const docker = require('../utils/docker')
-const {v4: uuidv4} = require('uuid');
-const passport = require('passport');
-const Room = require('../models/Room')
+const {jwtAuth} = require('../middlewares/auth')
+const roomController = require('../controllers/room')
 
-router.get('/',  passport.authenticate(
-    'jwt',
-    { session: false }),
-    async (req,res)=>{
-        res.send(req.user)
-    })
+// @desc    Get rooms that user has joined or hosted
+// @route   GET /rooms
+router.get('/',jwtAuth,roomController.getRooms)
 
+// @desc    Create a new room
+// @route   POST /rooms
+router.post('/', jwtAuth, roomController.spinDockerContainer)
 
-router.post('/', passport.authenticate(
-    'jwt',
-    { session: false }) ,async (req, res) => {
-    console.log(req.user)
-    const room = await docker.createRoom(
-        process.env.USER_SERVER_IMAGE,
-        uuidv4(),
-        process.env.USER_SERVER_MEM_LIMIT,
-        process.env.USER_SERVER_CPU_LIMIT,
-        process.env.USER_SERVER_URL,
-        process.env.USER_SERVER_NETWORK)
-    res.json(room)
-})
+// @desc    Join a new room using invite code
+// @route   POST /rooms/join
+router.post('/join',jwtAuth,roomController.joinRoom)
+
+// @desc    Check if the room name is available
+// @route   GET /rooms/checkRoomName
+router.get('/checkRoomName',jwtAuth,roomController.checkRoomName)
+
+// @desc    Get information of a particular room
+// @route   GET /rooms/:inviteCode(uuid4)
+router.get('/:inviteCode([0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})',jwtAuth,roomController.getRoomInfo)
 
 module.exports = router

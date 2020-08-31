@@ -33,7 +33,7 @@ createRoom = async (image, roomId, memLimit, cpuLimit, host, network) => {
         logger.info(`started docker container for room ${roomId} from image ${image}`)
         res = {
             "status": "created",
-            "room_url": `http://${host}/${roomId}`
+            "roomURL": `http://${host}/${roomId}`
         }
     }).catch(function (err) {
         logger.error(`error occurred while creating for room ${roomId} from image ${image} ${err}`)
