@@ -2,7 +2,7 @@ const Docker = require('dockerode');
 const logger = require('./logger');
 
 createRoom = async (image, roomId, memLimit, cpuLimit, host, network) => {
-    const docker = new Docker({socketPath: process.env.DOCKER_SOCKET});
+    const docker = new Docker({ socketPath: process.env.DOCKER_SOCKET });
     let auxContainer;
     let res = {};
     logger.info(`creating docker container for room ${roomId} from image ${image}`)
@@ -14,8 +14,12 @@ createRoom = async (image, roomId, memLimit, cpuLimit, host, network) => {
         AttachStderr: true,
         Labels: {
             [`traefik.http.routers.${roomId}.rule`]: "Host(`" + host + "`) && PathPrefix(`/" + roomId + "`)",
-            [`traefik.http.routers.${roomId}.middlewares`]: roomId + "-stripprefix",
-            [`traefik.http.middlewares.${roomId}-stripprefix.stripprefix.prefixes`]: "/" + roomId
+            [`traefik.http.middlewares.${roomId}-stripprefix.stripprefix.prefixes`]: "/" + roomId,
+            [`traefik.http.middlewares.${roomId}-auth.forwardauth.address`]: `http://localhost/auth`,
+            [`traefik.http.middlewares.${roomId}-ratelimit.ratelimit.average`]:"100",
+            [`traefik.http.middlewares.${roomId}-ratelimit.ratelimit.burst`]:"50",
+            [`traefik.http.routers.${roomId}.middlewares`]: `${roomId}-stripprefix, ${roomId}-auth, ${roomId}-ratelimit`,
+            [`traefik.http.middlewares.${roomId}-auth.forwardauth.trustForwardHeader`]:"true"      
         },
         Tty: true,
         OpenStdin: false,
@@ -33,7 +37,7 @@ createRoom = async (image, roomId, memLimit, cpuLimit, host, network) => {
         logger.info(`started docker container for room ${roomId} from image ${image}`)
         res = {
             "status": "created",
-            "room_url": `http://${host}/${roomId}`
+            "roomURL": `http://${host}/${roomId}`
         }
     }).catch(function (err) {
         logger.error(`error occurred while creating for room ${roomId} from image ${image} ${err}`)

@@ -2,7 +2,7 @@ version: "3"
 services:
   reverse-proxy:
     image: traefik:v2.2
-    command: --api.insecure=true --providers.docker
+    command: --api.insecure=true --providers.docker --entryPoints.web.address=:80 --entryPoints.web.forwardedHeaders.insecure
     networks:
       - executeit
     ports:
@@ -16,18 +16,19 @@ services:
     build:
       context: .
     ports:
-      - "5000:5000"
+      - "5000"
     volumes:
       - ./:/usr/src/app
       - /var/run/docker.sock:/var/run/docker.sock
-
+    networks:
+      - executeit
     command: >
       sh -c "yarn dev"
     environment:
       - NODE_ENV=dev
       - PORT=5000
-      - TRAEFIK_HOST=localhost
       - DOCKER_SOCKET=/var/run/docker.sock
+      - USER_SERVER_URL=rooms.localhost
       - USER_SERVER_IMAGE=user-image
       - USER_SERVER_CPU_LIMIT=10
       - USER_SERVER_MEM_LIMIT=256000
@@ -36,9 +37,17 @@ services:
       - MONGO_DB_NAME=executeit
       - MONGO_USER=root
       - MONGO_PASSWORD=example
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CALLBACK_URL=/auth/google/callback
+      - JWT_SECRET=gocoronago
+    labels:
+      - "traefik.http.routers.app.rule=Host(`localhost`)"
   mongo:
     image: mongo
     restart: always
+    networks:
+      - executeit
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
@@ -46,11 +55,23 @@ services:
   mongo-express:
     image: mongo-express
     restart: always
+    networks:
+      - executeit
     ports:
       - 8081:8081
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
+  
+  ot-server:
+    image: convergencelabs/convergence-omnibus
+    networks:
+      - executeit
+    ports:
+      - "80"
+    labels:
+      - "traefik.http.routers.ot-server.rule=Host(`ot.localhost`)"
+
 networks:
   executeit:
     external:
