@@ -2,7 +2,7 @@ version: "3"
 services:
   reverse-proxy:
     image: traefik:v2.2
-    command: --api.insecure=true --providers.docker
+    command: --api.insecure=true --providers.docker --entryPoints.web.address=:80 --entryPoints.web.forwardedHeaders.insecure
     networks:
       - executeit
     ports:
