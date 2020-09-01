@@ -4,7 +4,8 @@ const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const querystring = require('querystring');
 const { User } = require('../models/User')
-const Room = require('../models/Room')
+const Room = require('../models/Room');
+const { jwtAuth } = require('../middlewares/auth');
 
 router.get('/', async (req, res) => {
     try {
@@ -36,6 +37,10 @@ router.get('/', async (req, res) => {
 
 })
 
+router.get('/verify',jwtAuth,(req,res)=>{
+    return res.status(200).json(req.user)
+})
+
 // @desc    Auth with Google
 // @route   GET /auth/google
 router.get('/google', passport.authenticate(
@@ -62,6 +67,7 @@ router.get(
             displayName: req.user.displayName,
             name: req.user.firstName,
             email: req.user.email,
+            image: req.user.image
         }
 
         let token = jwt.sign({

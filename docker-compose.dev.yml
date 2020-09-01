@@ -17,6 +17,7 @@ services:
       context: .
     ports:
       - "5000"
+    restart: always
     volumes:
       - ./:/usr/src/app
       - /var/run/docker.sock:/var/run/docker.sock
