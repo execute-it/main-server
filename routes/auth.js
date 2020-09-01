@@ -66,7 +66,7 @@ router.get(
 
         let token = jwt.sign({
             data: user
-        }, process.env.JWT_SECRET, { expiresIn: '1h' })
+        }, process.env.JWT_SECRET, { expiresIn: '1d' })
         res.cookie('jwt', token)
         res.redirect('/profile')
     }
