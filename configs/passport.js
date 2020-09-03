@@ -6,17 +6,18 @@ const JwtStrategy = require('passport-jwt').Strategy
 const { verifyUser } = require('../middlewares/auth')
 
 let opts = {}
-opts.jwtFromRequest = function (req) {
+opts.jwtFromRequest = function(req) {
     let token = null;
-    if (req && req.cookies) {
-        token = req.cookies['jwt'];
+    if (req) {
+        console.log(req.headers)
+        token = req.headers['x-api-key']
     }
     return token;
 };
 opts.secretOrKey = process.env.JWT_SECRET;
 
-module.exports = function (passport) {
-    passport.use(new JwtStrategy(opts, function (jwt_payload, done) {
+module.exports = function(passport) {
+    passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
         console.log("JWT BASED  VALIDATION GETTING CALLED")
         console.log("JWT", jwt_payload)
         if (verifyUser(jwt_payload.data)) {
@@ -30,7 +31,7 @@ module.exports = function (passport) {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: process.env.GOOGLE_CALLBACK_URL
-    }, async (accessToken, refreshToken, profile, done) => {
+    }, async(accessToken, refreshToken, profile, done) => {
         console.log(profile)
         const newUser = {
             googleId: profile.id,
@@ -55,12 +56,12 @@ module.exports = function (passport) {
             console.error(e)
         }
     }))
-    passport.serializeUser(function (user, cb) {
+    passport.serializeUser(function(user, cb) {
         console.log('I should have jack ')
         cb(null, user);
     });
 
-    passport.deserializeUser(function (obj, cb) {
+    passport.deserializeUser(function(obj, cb) {
         console.log('I wont have jack shit')
         cb(null, obj);
     });

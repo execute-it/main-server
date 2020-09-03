@@ -5,7 +5,7 @@ const Room = require('../models/Room')
 const { response } = require('express')
 const { isUUID } = require('validator')
 
-const spinDockerContainer = async (req, res) => {
+const spinDockerContainer = async(req, res) => {
     try {
         if (!req.body.roomName) {
             return res.status(400).json({ status: "specify room name" })
@@ -60,7 +60,10 @@ const spinDockerContainer = async (req, res) => {
     }
 }
 
-const checkRoomName = async (req, res) => {
+const checkRoomName = async(req, res) => {
+    if (!req.body.roomName) {
+        return res.status(400).json({ isValid: "false" })
+    }
     const newRoomName = req.body.roomName
 
     const room = await Room.findOne({ roomName: newRoomName })
@@ -70,7 +73,7 @@ const checkRoomName = async (req, res) => {
     return res.status(200).json({ "isValid": true })
 }
 
-const getRooms = async (req, res) => {
+const getRooms = async(req, res) => {
     try {
         const user = await User.findOne({ email: req.user.email });
         console.log(user._id)
@@ -101,15 +104,14 @@ const getRooms = async (req, res) => {
         }).then(() => {
             return res.status(200).json({ status: "success", rooms: response })
         })
-    }
-    catch (e) {
+    } catch (e) {
         return res.status(400).json({ status: "error" })
     }
 
 
 }
 
-const joinRoom = async (req, res) => {
+const joinRoom = async(req, res) => {
     const inviteCode = req.query.inviteCode
     let response;
 
@@ -132,11 +134,7 @@ const joinRoom = async (req, res) => {
 
 
 
-            const roomJoin = await Room.findOneAndUpdate(
-                { inviteCode: inviteCode },
-                { $push: { participants: userId } },
-                { new: true, upsert: true }
-            )
+            const roomJoin = await Room.findOneAndUpdate({ inviteCode: inviteCode }, { $push: { participants: userId } }, { new: true, upsert: true })
 
             response = {
                 status: 'room_joined',
@@ -156,7 +154,7 @@ const joinRoom = async (req, res) => {
     res.status(400).json({ status: 'invite_code_not_valid' })
 }
 
-const getRoomInfo = async (req, res) => {
+const getRoomInfo = async(req, res) => {
     const inviteCode = req.params.inviteCode
     console.log(req.user)
     const email = req.user.email

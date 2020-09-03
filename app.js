@@ -5,6 +5,7 @@ const passport = require('passport')
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 var compression = require('compression')
+var cors = require('cors')
 
 require('./configs/db.js')
 require('./configs/passport')(passport)
@@ -12,6 +13,9 @@ require('./configs/passport')(passport)
 const expressLogger = expressPino({ logger });
 const port = parseInt(process.env.PORT)
 const app = express()
+
+//DISABLE THIS IS PROD
+app.use(cors())
 
 app.use(compression())
 app.use(expressLogger);
