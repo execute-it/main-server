@@ -14,7 +14,7 @@ const expressLogger = expressPino({ logger });
 const port = parseInt(process.env.PORT)
 const app = express()
 
-//DISABLE THIS IS PROD
+//DISABLE THIS FOR PROD
 app.use(cors())
 
 app.use(compression())

@@ -70,7 +70,6 @@ router.get(
         let token = jwt.sign({
             data: user
         }, process.env.JWT_SECRET, { expiresIn: '1d' })
-        res.cookie('jwt', token)
         res.redirect(`http://localhost:3000/callback?token=${token}`)
     }
 )

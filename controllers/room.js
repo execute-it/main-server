@@ -44,7 +44,8 @@ const spinDockerContainer = async(req, res) => {
                     roomName: doc.roomName,
                     createdAt: doc.createdAt,
                     inviteCode: doc.inviteCode,
-                    roomURL: doc.roomURL
+                    roomURL: doc.roomURL,
+                    roomId: doc._id
                 }
             })
             return res.status(201).json(response)
@@ -86,7 +87,8 @@ const getRooms = async(req, res) => {
                     roomName: x.roomName,
                     inviteCode: x.inviteCode,
                     roomURL: x.roomURL,
-                    isHost: true
+                    isHost: true,
+                    roomId: x._id
                 })
             })
         })
@@ -124,12 +126,12 @@ const joinRoom = async(req, res) => {
 
             //check if user is host
             if (room.host.toString() == userId.toString()) {
-                return res.json({ status: 'already_joined' })
+                return res.status(409).json({ status: 'already_joined' })
             }
 
             //check if user is participant
             if (room.participants.indexOf(userId) > -1) {
-                return res.json({ status: 'already_joined' })
+                return res.tatus(409).json({ status: 'already_joined' })
             }
 
 
@@ -140,7 +142,8 @@ const joinRoom = async(req, res) => {
                 status: 'room_joined',
                 roomName: roomJoin.roomName,
                 inviteCode: roomJoin.inviteCode,
-                roomURL: roomJoin.roomURL
+                roomURL: roomJoin.roomURL,
+                roomId: roomJoin._id
             }
             return res.json(response)
 
