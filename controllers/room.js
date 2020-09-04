@@ -12,6 +12,7 @@ const spinDockerContainer = async(req, res) => {
         }
 
         const user = await User.findOne({ email: req.user.email })
+        console.log(user, 'SDDFSFSDFSD')
         const newRoom = {
             roomName: req.body.roomName,
             host: user._id
