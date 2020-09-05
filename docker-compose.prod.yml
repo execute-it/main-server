@@ -2,18 +2,17 @@ version: "3"
 services:
   reverse-proxy:
     image: traefik:v2.2
-    command: --api.insecure=true --providers.docker --entryPoints.web.address=:80 --entryPoints.web.forwardedHeaders.insecure
+    command: --providers.docker --entryPoints.web.address=:80 --entryPoints.web.forwardedHeaders.insecure
     networks:
       - executeit
     ports:
       # The HTTP port
       - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
-      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   app:
-    image: flameslayer/execute-it-main-server:latest
+    build:
+      context: .
     ports:
       - "5000"
     volumes:
@@ -27,8 +26,8 @@ services:
       - NODE_ENV=production
       - PORT=5000
       - DOCKER_SOCKET=/var/run/docker.sock
-      - USER_SERVER_URL=rooms.localhost
-      - USER_SERVER_IMAGE=user-image-1
+      - USER_SERVER_URL=rooms.executeit.ml
+      - USER_SERVER_IMAGE=execute-it-user-image
       - USER_SERVER_CPU_LIMIT=10
       - USER_SERVER_MEM_LIMIT=256000
       - USER_SERVER_NETWORK=executeit
@@ -38,9 +37,10 @@ services:
       - MONGO_PASSWORD=example
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GOOGLE_CALLBACK_URL=/auth/google/callback
+      - GOOGLE_CALLBACK_URL=https://api.executeit.ml/auth/google/callback
       - JWT_SECRET=gocoronago
       - OT_SERVER_URL=https://ot.executeit.ml/api/rest
+      - FRONTEND_REDIRECT_URL=https://executeit.ml/callback
 
     labels:
       - "traefik.http.routers.app.rule=Host(`api.executeit.ml`)"
@@ -52,22 +52,15 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - ./mongo-volume:/data/db
 
-  mongo-express:
-    image: mongo-express
-    restart: always
-    networks:
-      - executeit
-    ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-  
   ot-server:
     image: convergencelabs/convergence-omnibus
     networks:
       - executeit
+    volumes:
+      - ./ot-volume:/orientdb/databases
     ports:
       - "80"
     labels:

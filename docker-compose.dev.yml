@@ -43,7 +43,8 @@ services:
       - GOOGLE_CALLBACK_URL=/auth/google/callback
       - JWT_SECRET=gocoronago
       - OT_SERVER_URL=http://ot-server/api/rest
-      - OT_API_KEY=sNVGRH2zBJBeh39YeqNLi5Zwi1JgujLUU0lVVZybiRML0QRbhKzioWrEIhohZxo2
+      - FRONTEND_REDIRECT_URL=http://localhost:3000/callback
+
     labels:
       - "traefik.http.routers.app.rule=Host(`localhost`)"
   mongo:

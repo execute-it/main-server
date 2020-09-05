@@ -22,14 +22,13 @@ createRoom = async(image, roomId, memLimit, cpuLimit, host, network) => {
             [`traefik.http.middlewares.${roomId}-auth.forwardauth.trustForwardHeader`]: "true"
         },
         Tty: true,
-        Env: [`PROJECT_ID=2233`, `OT_SERVER_URL=${process.env.OT_SERVER_URL}`, `OT_API_KEY=${process.env.OT_API_KEY}`],
         OpenStdin: false,
         StdinOnce: false,
-        // HostConfig: {
-        //     "Memory": 26435456,
-        //     "CpuPeriod": 100000,
-        //     "CpuQuota": 25000
-        // },
+        HostConfig: {
+            "Memory": 26435456,
+            "CpuPeriod": 100000,
+            "CpuQuota": 50000
+        },
         NetworkingConfig: {
             EndpointsConfig: {
                 [network]: {}
