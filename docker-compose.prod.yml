@@ -13,8 +13,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   app:
-    build:
-      context: .
+    image: flameslayer/execute-it-main-server:latest
     ports:
       - "5000"
     volumes:
@@ -42,7 +41,7 @@ services:
       - GOOGLE_CALLBACK_URL=/auth/google/callback
       - JWT_SECRET=gocoronago
     labels:
-      - "traefik.http.routers.app.rule=Host(`localhost`)"
+      - "traefik.http.routers.app.rule=Host(`api.executeit.ml`)"
   mongo:
     image: mongo
     restart: always
@@ -70,7 +69,7 @@ services:
     ports:
       - "80"
     labels:
-      - "traefik.http.routers.ot-server.rule=Host(`ot.localhost`)"
+      - "traefik.http.routers.ot-server.rule=Host(`ot.executeit.ml`)"
 
 networks:
   executeit:

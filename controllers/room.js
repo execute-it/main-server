@@ -49,7 +49,9 @@ const spinDockerContainer = async(req, res) => {
                     roomId: doc._id
                 }
             })
-            return res.status(201).json(response)
+            setTimeout(() => {
+                return res.status(201).json(response)
+            }, 1000)
         } else {
             await Room.findOneAndUpdate({ _id: room._id }, { status: "error" }, { new: true }, (err, doc) => {
                 return res.status(400).json({ status: "error" })
@@ -132,7 +134,7 @@ const joinRoom = async(req, res) => {
 
             //check if user is participant
             if (room.participants.indexOf(userId) > -1) {
-                return res.tatus(409).json({ status: 'already_joined' })
+                return res.status(409).json({ status: 'already_joined' })
             }
 
 
@@ -150,12 +152,13 @@ const joinRoom = async(req, res) => {
 
 
         } catch (e) {
-            res.status(400).json({ status: "error" })
+            console.log(e)
+            return res.status(400).json({ status: "error" })
 
         }
     }
 
-    res.status(400).json({ status: 'invite_code_not_valid' })
+    return res.status(400).json({ status: 'invite_code_not_valid' })
 }
 
 const getRoomInfo = async(req, res) => {
