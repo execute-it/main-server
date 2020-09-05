@@ -15,7 +15,7 @@ createRoom = async(image, roomId, memLimit, cpuLimit, host, network) => {
         Labels: {
             [`traefik.http.routers.${roomId}.rule`]: "Host(`" + host + "`) && PathPrefix(`/" + roomId + "`)",
             [`traefik.http.middlewares.${roomId}-stripprefix.stripprefix.prefixes`]: "/" + roomId,
-            [`traefik.http.middlewares.${roomId}-auth.forwardauth.address`]: `http://localhost/auth`,
+            [`traefik.http.middlewares.${roomId}-auth.forwardauth.address`]: process.env.AUTH_SERVER_URL,
             [`traefik.http.middlewares.${roomId}-ratelimit.ratelimit.average`]: "100",
             [`traefik.http.middlewares.${roomId}-ratelimit.ratelimit.burst`]: "50",
             [`traefik.http.routers.${roomId}.middlewares`]: `${roomId}-stripprefix, ${roomId}-auth, ${roomId}-ratelimit`,

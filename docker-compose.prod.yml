@@ -2,12 +2,14 @@ version: "3"
 services:
   reverse-proxy:
     image: traefik:v2.2
-    command: --providers.docker --entryPoints.web.address=:80 --entryPoints.web.forwardedHeaders.insecure
+    command: --api.insecure=true --providers.docker --entryPoints.web.address=:80 --entryPoints.web.forwardedHeaders.insecure
     networks:
       - executeit
     ports:
       # The HTTP port
       - "80:80"
+      - "8080:8080"
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   app:
@@ -41,6 +43,8 @@ services:
       - JWT_SECRET=gocoronago
       - OT_SERVER_URL=https://ot.executeit.ml/api/rest
       - FRONTEND_REDIRECT_URL=https://executeit.ml/callback
+      - AUTH_SERVER_URL=https://api.executeit.ml/auth
+
 
     labels:
       - "traefik.http.routers.app.rule=Host(`api.executeit.ml`)"
