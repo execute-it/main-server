@@ -70,7 +70,7 @@ router.get(
         let token = jwt.sign({
             data: user
         }, process.env.JWT_SECRET, { expiresIn: '1d' })
-        res.redirect(`http://localhost:3000/callback?token=${token}`)
+        res.redirect(`${process.env.FRONTEND_REDIRECT_URL}?token=${token}`)
     }
 )
 
