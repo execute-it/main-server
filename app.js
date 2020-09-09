@@ -10,7 +10,7 @@ var cors = require('cors')
 require('./configs/db.js')
 require('./configs/passport')(passport)
 
-const expressLogger = expressPino({ logger });
+const expressLogger = expressPino({logger});
 const port = parseInt(process.env.PORT)
 const app = express()
 
@@ -21,7 +21,7 @@ app.use(compression())
 app.use(expressLogger);
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(passport.initialize());
 

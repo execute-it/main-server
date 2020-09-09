@@ -3,8 +3,8 @@ let validator = require('validator')
 
 let UserSchema = new mongoose.Schema({
     googleId: {
-      type: String,
-      required: true
+        type: String,
+        required: true
     },
     displayName: {
         type: String,
@@ -38,7 +38,7 @@ let UserSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', UserSchema)
 
-module.exports =  {
+module.exports = {
     UserSchema,
     User
 }

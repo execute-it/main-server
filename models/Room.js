@@ -1,7 +1,7 @@
 let mongoose = require('mongoose')
 let validator = require('validator')
-const { UserSchema } = require('./User')
-const { v4: uuidv4 } = require('uuid');
+const {UserSchema} = require('./User')
+const {v4: uuidv4} = require('uuid');
 
 let RoomSchema = new mongoose.Schema({
     _id: {
@@ -32,7 +32,7 @@ let RoomSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, ref: 'User',
         required: true,
     },
-    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    participants: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     createdAt: {
         type: Date,
         default: Date.now()
