@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "NODE_ENV=prod node app.js",
-    "dev": "NODE_ENV=dev nodemon utils/app.js | pino-colada",
+    "start": "node app.js",
+    "dev": "nodemon utils/app.js | pino-colada",
     "pretest": "eslint --ignore-path .gitignore ."
   },
   "repository": {
@@ -21,7 +21,9 @@
   "homepage": "https://github.com/execute-it/main-server#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
     "dockerode": "^3.2.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -33,6 +35,7 @@
     "passport-jwt": "^4.0.0",
     "pino": "^6.5.1",
     "pino-colada": "^2.1.0",
+    "pm2": "^4.4.1",
     "uuid": "^8.3.0",
     "validator": "^13.1.1"
   },

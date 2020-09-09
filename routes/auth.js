@@ -4,9 +4,10 @@ const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const querystring = require('querystring');
 const { User } = require('../models/User')
-const Room = require('../models/Room')
+const Room = require('../models/Room');
+const { jwtAuth } = require('../middlewares/auth');
 
-router.get('/', async (req, res) => {
+router.get('/', async(req, res) => {
     try {
         const requestURI = req.headers['x-forwarded-uri']
         const roomId = req.headers['x-forwarded-prefix'].split('/')[1]
@@ -28,23 +29,25 @@ router.get('/', async (req, res) => {
         }
 
         return res.status(401).send('Unauthorised')
-    }
-
-    catch (e) {
+    } catch (e) {
         return res.status(401).send('Unauthorised')
     }
 
+})
+
+router.get('/verify', jwtAuth, (req, res) => {
+    return res.status(200).json(req.user)
 })
 
 // @desc    Auth with Google
 // @route   GET /auth/google
 router.get('/google', passport.authenticate(
     'google', {
-    session: false,
-    scope: ["profile", "email"],
-    accessType: "offline",
-    approvalPrompt: "force"
-}))
+        session: false,
+        scope: ["profile", "email"],
+        accessType: "offline",
+        approvalPrompt: "force"
+    }))
 
 
 // @desc    Google auth callback
@@ -52,8 +55,7 @@ router.get('/google', passport.authenticate(
 router.get(
     '/google/callback',
     passport.authenticate(
-        'google',
-        {
+        'google', {
             failureRedirect: '/',
             session: false
         }),
@@ -62,13 +64,13 @@ router.get(
             displayName: req.user.displayName,
             name: req.user.firstName,
             email: req.user.email,
+            image: req.user.image
         }
 
         let token = jwt.sign({
             data: user
         }, process.env.JWT_SECRET, { expiresIn: '1d' })
-        res.cookie('jwt', token)
-        res.redirect('/profile')
+        res.redirect(`${process.env.FRONTEND_REDIRECT_URL}?token=${token}`)
     }
 )
 
@@ -76,6 +78,6 @@ router.get(
 // @route   /auth/logout
 router.get('/logout', (req, res) => {
     req.logout()
-    res.redirect('/')
+    res.redirect('http://localhost:3000')
 })
 module.exports = router
