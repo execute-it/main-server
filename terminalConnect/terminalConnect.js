@@ -1,11 +1,11 @@
 const express = require('express');
-const expressWs = require('express-ws');
 const cors = require('cors');
 const bodyParser = require('body-parser')
+const WebSocketServer = require('websocket').server;
 
 const Docker = require('dockerode')
 
-const demux = require('./demux')
+const processOutput = require('./processOutput')
 
 const docker = new Docker({socketPath: "/var/run/docker.sock"})
 
@@ -14,14 +14,14 @@ const app = express();
 app.use(cors())
 app.use(bodyParser.json());
 
-expressWs(app);
+const server = app.listen(8888, ()=>console.log("Listening on 8888"))
 
-app.ws('/terminals', (ws, req)=>{
-    // ws.send("welcome")
-    runExec(ws, "e7a3d0d08957")
+const wsServer = new WebSocketServer({httpServer: server, autoAcceptConnections: false})
+
+wsServer.on('request', function(request) {
+    const connection = request.accept('terminal-connect', request.origin);
+    runExec(connection, "6e28872000bc")
 })
-
-app.listen(8888, ()=>console.log("Listening on 8888"))
 
 function runExec(ws, containerId){
     const options = {
@@ -48,10 +48,10 @@ function runExec(ws, containerId){
                 return;
             }
 
-            demux(stream, ws)
+            processOutput(stream, ws)
 
             ws.on('message', (msg)=>{
-                stream.write(msg)
+                stream.write(msg.utf8Data)
             })
 
             stream.on('error', function(err) {

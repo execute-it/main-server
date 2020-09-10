@@ -1,7 +1,9 @@
+// Watches for the output on stream, decodes it ans sends it back through the websocket
+
 module.exports = function (stream, ws) {
-    var nextDataType = null;
-    var nextDataLength = null;
-    var buffer = Buffer.from('');
+    let nextDataType = null;
+    let nextDataLength = null;
+    let buffer = Buffer.from('');
 
     function processData(data) {
         if (data) {
@@ -9,7 +11,7 @@ module.exports = function (stream, ws) {
         }
         if (!nextDataType) {
             if (buffer.length >= 8) {
-                var header = bufferSlice(8);
+                const header = bufferSlice(8);
                 nextDataType = header.readUInt8(0);
                 nextDataLength = header.readUInt32BE(4);
                 // It's possible we got a "data" that contains multiple messages
@@ -18,14 +20,8 @@ module.exports = function (stream, ws) {
             }
         } else {
             if (buffer.length >= nextDataLength) {
-                var content = bufferSlice(nextDataLength);
-                if (nextDataType === 1) {
-                    // stdout.write(content);
-                    ws.send(content)
-                } else {
-                    // stderr.write(content);
-                    ws.send(content)
-                }
+                const content = bufferSlice(nextDataLength);
+                ws.send(content)
                 nextDataType = null;
                 // It's possible we got a "data" that contains multiple messages
                 // Process the next one
@@ -35,7 +31,7 @@ module.exports = function (stream, ws) {
     }
 
     function bufferSlice(end) {
-        var out = buffer.slice(0, end);
+        const out = buffer.slice(0, end);
         buffer = Buffer.from(buffer.slice(end, buffer.length));
         return out;
     }
