@@ -1,27 +1,38 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser')
 const WebSocketServer = require('websocket').server;
-
 const Docker = require('dockerode')
-
 const processOutput = require('./processOutput')
 
-const docker = new Docker({socketPath: "/var/run/docker.sock"})
+const docker = new Docker({socketPath: process.env.DOCKER_SOCKET || "/var/run/docker.sock"})
 
-const app = express();
+// Handles terminal connections via websocket
+module.exports = function handleTerminalConnections(server) {
+    const wsServer = new WebSocketServer({httpServer: server, autoAcceptConnections: false})
 
-app.use(cors())
-app.use(bodyParser.json());
+    wsServer.on('request', function(request) {
+        const pathParams = request.httpRequest.url.split('/').splice(1)
 
-const server = app.listen(8888, ()=>console.log("Listening on 8888"))
+        if(pathParams[0]!=='terminals') {
+            request.reject()
+            return
+        }
 
-const wsServer = new WebSocketServer({httpServer: server, autoAcceptConnections: false})
+        isContainerValid(pathParams[1], (err)=>{
+            if(err){
+                request.reject()
+                return
+            }
 
-wsServer.on('request', function(request) {
-    const connection = request.accept('terminal-connect', request.origin);
-    runExec(connection, "6e28872000bc")
-})
+            const connection = request.accept('terminal-connect', request.origin);
+            runExec(connection, pathParams[1])
+        })
+    })
+}
+
+function isContainerValid(containerId, cb) {
+    docker.getContainer(containerId).stats({}, err=>{
+        cb(err)
+    })
+}
 
 function runExec(ws, containerId){
     const options = {

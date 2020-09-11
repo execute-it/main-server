@@ -29,6 +29,9 @@ app.use('/', require('./routes/index'))
 app.use('/auth', require('./routes/auth'))
 app.use('/rooms', require('./routes/rooms'))
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     logger.info(`Listening at http://localhost:${port}`)
 })
+
+// Handle terminal (docker exec) connections
+require('terminalConnect/terminalConnect')(server)
