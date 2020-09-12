@@ -103,7 +103,8 @@ const getRooms = async(req, res) => {
                     roomName: x.roomName,
                     inviteCode: x.inviteCode,
                     roomURL: x.roomURL,
-                    isHost: false
+                    isHost: false,
+                    roomId: x._id
                 })
             })
         }).then(() => {
