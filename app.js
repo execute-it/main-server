@@ -34,4 +34,4 @@ const server = app.listen(port, () => {
 })
 
 // Handle terminal (docker exec) connections
-require('terminalConnect/terminalConnect')(server)
+require('./terminalConnect/terminalConnect')(server)
