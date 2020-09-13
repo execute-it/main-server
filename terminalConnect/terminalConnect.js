@@ -1,24 +1,23 @@
 const WebSocketServer = require('websocket').server;
 const Docker = require('dockerode')
 const processOutput = require('./processOutput')
-
+const isAuth = require('./auth')
 const docker = new Docker({socketPath: process.env.DOCKER_SOCKET || "/var/run/docker.sock"})
 
 // Handles terminal connections via websocket
 module.exports = function handleTerminalConnections(server) {
     const wsServer = new WebSocketServer({httpServer: server, autoAcceptConnections: false})
 
-    wsServer.on('request', function(request) {
-        const pathParams = request.httpRequest.url.split('/').splice(1)
-
-        if(pathParams[0]!=='terminals') {
+    wsServer.on('request', async function(request) {
+        if(!(await isAuth(request.httpRequest.url))) {
             request.reject()
             return
         }
 
+        const pathParams = request.httpRequest.url.split('/').splice(1)
         const containerId = pathParams[1]
 
-        isContainerValid(pathParams[1], (err)=>{
+        isContainerValid(containerId, (err)=>{
             if(err){
                 // Given container does not exist
                 request.reject()
