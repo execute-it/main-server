@@ -45,6 +45,7 @@ services:
       - OT_SERVER_URL=http://ot-server/api/rest
       - FRONTEND_REDIRECT_URL=http://localhost:3000/callback
       - AUTH_SERVER_URL=http://localhost/auth
+      - USER_DATA_BASE_PATH=./data
 
     labels:
       - "traefik.http.routers.app.rule=Host(`localhost`)"

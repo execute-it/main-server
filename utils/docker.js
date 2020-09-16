@@ -33,6 +33,12 @@ createRoom = async(image, roomId, memLimit, cpuLimit, host, network) => {
             EndpointsConfig: {
                 [network]: {}
             }
+        },
+        Volumes: {
+            "/home/user/": {}
+        },
+        Hostconfig: {
+            Binds: [`${process.env.USER_DATA_BASE_PATH}/${roomId}/:/home/user/`]
         }
     }).then(function(container) {
         logger.info(`starting docker container for room ${roomId} from image ${image}`)
