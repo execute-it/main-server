@@ -36,7 +36,8 @@ const spinDockerContainer = async(req, res) => {
             process.env.USER_SERVER_MEM_LIMIT,
             process.env.USER_SERVER_CPU_LIMIT,
             process.env.USER_SERVER_URL,
-            process.env.USER_SERVER_NETWORK)
+            process.env.USER_SERVER_NETWORK,
+            `${process.env.USER_DATA_BASE_PATH}/${room._id}`)
 
         if (spawnImage.status === 'created') {
             await Room.findOneAndUpdate({ _id: room._id }, { roomURL: spawnImage.roomURL }, { new: true }, (err, doc) => {

@@ -3,6 +3,9 @@ const Docker = require('dockerode')
 const processOutput = require('./processOutput')
 const isAuth = require('./auth')
 const querystring = require('querystring');
+const myDocker = require("../utils/docker");
+
+
 const docker = new Docker({socketPath: process.env.DOCKER_SOCKET || "/var/run/docker.sock"})
 
 // Handles terminal connections via websocket
@@ -13,7 +16,7 @@ module.exports = function handleTerminalConnections(server) {
         const queryParams = querystring.parse(request.httpRequest.url.split("?")[1])
 
         if(!(await isAuth(queryParams))) {
-            request.reject()
+            request.reject("Unauthenticated")
             return
         }
 
@@ -22,11 +25,19 @@ module.exports = function handleTerminalConnections(server) {
         console.log("room", containerId)
         console.log("token", queryParams.token)
 
-        isContainerValid(containerId, (err)=>{
+        isContainerValid(containerId, async (err)=>{
             if(err){
-                // Given container does not exist
-                request.reject()
-                return
+                // Given container does not exist, spin it
+                const spawnImage = await myDocker.createRoom(
+                    process.env.USER_SERVER_IMAGE,
+                    containerId,
+                    process.env.USER_SERVER_MEM_LIMIT,
+                    process.env.USER_SERVER_CPU_LIMIT,
+                    process.env.USER_SERVER_URL,
+                    process.env.USER_SERVER_NETWORK,
+                    `${process.env.USER_DATA_BASE_PATH}/${containerId}`)
+                if (spawnImage.status !== 'created')
+                    request.reject("Error creating Linux environment")
             }
 
             const connection = request.accept('terminal-connect', request.origin);

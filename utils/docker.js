@@ -1,7 +1,9 @@
 const Docker = require('dockerode');
 const logger = require('./logger');
+const redisQ = require('./redisQueue')
 
-createRoom = async(image, roomId, memLimit, cpuLimit, host, network) => {
+
+createRoom = async(image, roomId, memLimit, cpuLimit, host, network, homePath) => {
     const docker = new Docker({ socketPath: process.env.DOCKER_SOCKET });
     let auxContainer;
     let res = {};
@@ -38,7 +40,7 @@ createRoom = async(image, roomId, memLimit, cpuLimit, host, network) => {
             "/home/user/": {}
         },
         Hostconfig: {
-            Binds: [`${process.env.USER_DATA_BASE_PATH}/${roomId}/:/home/user/`]
+            Binds: [`${homePath}/:/home/user/`]
         }
     }).then(function(container) {
         logger.info(`starting docker container for room ${roomId} from image ${image}`)
@@ -46,6 +48,17 @@ createRoom = async(image, roomId, memLimit, cpuLimit, host, network) => {
         return auxContainer.start();
     }).then(function() {
         logger.info(`started docker container for room ${roomId} from image ${image}`)
+        redisQ.connect().then(()=>{
+            redisQ.push(process.env.AUTO_CULL_QUEUE, {
+                roomId,
+                shouldCull: false,
+                timestamp: new Date().toISOString(),
+            })
+            redisQ.push(process.env.AUTO_SAVE_QUEUE, {
+                roomId,
+                timestamp: new Date().toISOString(),
+            })
+        })
         res = {
             "status": "created",
             "roomURL": `${host}/${roomId}`
@@ -60,6 +73,6 @@ createRoom = async(image, roomId, memLimit, cpuLimit, host, network) => {
     return res
 }
 
-// createRoom('pratik', 'cvbn', '', '', 'localhost', 'executeit')
+// createRoom('pratik', 'cvbn', '', '', 'localhost', 'executeit', '/home/userdata/room2243')
 
 exports.createRoom = createRoom

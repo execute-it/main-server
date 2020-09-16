@@ -1,4 +1,7 @@
 version: "3"
+
+#GOOGLE_CLIENT_ID: "cneorfn034"
+
 services:
   reverse-proxy:
     image: traefik:v2.2
@@ -12,6 +15,12 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  redis:
+    image: redis
+    networks:
+      - executeit
+
   app:
     build:
       context: .
@@ -45,7 +54,11 @@ services:
       - OT_SERVER_URL=http://ot-server/api/rest
       - FRONTEND_REDIRECT_URL=http://localhost:3000/callback
       - AUTH_SERVER_URL=http://localhost/auth
-      - USER_DATA_BASE_PATH=./data
+      - USER_DATA_BASE_PATH=/home/execute-it-user-data # without trailing /
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AUTO_CULL_QUEUE=auto-cull-queue
+      - AUTO_SAVE_QUEUE=auto-save-queue
 
     labels:
       - "traefik.http.routers.app.rule=Host(`localhost`)"
@@ -77,6 +90,24 @@ services:
       - "80"
     labels:
       - "traefik.http.routers.ot-server.rule=Host(`ot.localhost`)"
+
+  auto-save-cull:
+    image: auto-save-cull
+    environment:
+      CONVERGENCE_API_KEY: "UGCvXZUKuYGhajyaA4cWGtRwDJIsiPpAzJ3uMsvZ4D73kW9DAGyh2rMMwcbF5Gbt"
+      OT_SERVER_URL: https://ot.executeit.ml/api
+      USER_DATA_BASE_PATH: "/worker/data" # Path inside container
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      AUTOSAVE_INTERVAL: 4 # In secs
+      AUTOCULL_INTERVAL: 10 # In secs (60*5)
+      DOCKER_SOCKET: "/var/run/docker.sock"
+    command: node app
+    networks:
+      - executeit
+    volumes:
+      - /home/execute-it-user-data:/worker/data
+      - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
   executeit:
