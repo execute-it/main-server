@@ -1,7 +1,5 @@
 version: "3"
 
-#GOOGLE_CLIENT_ID: "cneorfn034"
-
 services:
   reverse-proxy:
     image: traefik:v2.2
@@ -18,6 +16,8 @@ services:
 
   redis:
     image: redis
+    ports:
+    - 6379:6379
     networks:
       - executeit
 
@@ -39,7 +39,7 @@ services:
       - PORT=5000
       - DOCKER_SOCKET=/var/run/docker.sock
       - USER_SERVER_URL=rooms.localhost
-      - USER_SERVER_IMAGE=user-image-1
+      - USER_SERVER_IMAGE=user-image
       - USER_SERVER_CPU_LIMIT=10
       - USER_SERVER_MEM_LIMIT=256000
       - USER_SERVER_NETWORK=executeit
@@ -54,7 +54,7 @@ services:
       - OT_SERVER_URL=http://ot-server/api/rest
       - FRONTEND_REDIRECT_URL=http://localhost:3000/callback
       - AUTH_SERVER_URL=http://localhost/auth
-      - USER_DATA_BASE_PATH=/home/execute-it-user-data # without trailing /
+      - USER_DATA_BASE_PATH=/home/pnshiralkar/execute-it-user-data # without trailing /
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - AUTO_CULL_QUEUE=auto-cull-queue
@@ -93,9 +93,12 @@ services:
 
   auto-save-cull:
     image: auto-save-cull
+    depends_on:
+      - ot-server
     environment:
-      CONVERGENCE_API_KEY: "UGCvXZUKuYGhajyaA4cWGtRwDJIsiPpAzJ3uMsvZ4D73kW9DAGyh2rMMwcbF5Gbt"
-      OT_SERVER_URL: https://ot.executeit.ml/api
+      CONVERGENCE_USERNAME: ${CONVERGENCE_USERNAME}
+      CONVERGENCE_PASSWORD: ${CONVERGENCE_PASSWORD}
+      OT_SERVER_URL: "http://ot-server/api"
       USER_DATA_BASE_PATH: "/worker/data" # Path inside container
       REDIS_HOST: redis
       REDIS_PORT: "6379"
@@ -106,7 +109,7 @@ services:
     networks:
       - executeit
     volumes:
-      - /home/execute-it-user-data:/worker/data
+      - /home/pnshiralkar/execute-it-user-data:/worker/data
       - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
