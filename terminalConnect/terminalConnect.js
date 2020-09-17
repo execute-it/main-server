@@ -61,6 +61,7 @@ function runExec(ws, containerId){
         AttachStdin: true,
         Detach: true,
         Tty: true,
+        User: "111:111"
     };
 
     docker.getContainer(containerId).exec(options, function(err, exec) {
