@@ -48,21 +48,25 @@ createRoom = async(image, roomId, memLimit, cpuLimit, host, network, homePath) =
         return auxContainer.start();
     }).then(function() {
         logger.info(`started docker container for room ${roomId} from image ${image}`)
-        redisQ.connect().then(()=>{
-            redisQ.push(process.env.AUTO_CULL_QUEUE, {
-                roomId,
-                shouldCull: false,
-                timestamp: new Date().toISOString(),
-            })
-            redisQ.push(process.env.AUTO_SAVE_QUEUE, {
-                roomId,
-                timestamp: new Date().toISOString(),
+        auxContainer.exec({Cmd: "/bin/bash /home/setup.sh".split(' ')}).then((exec)=>{
+            exec.start({}).then(()=>{
+                redisQ.connect().then(()=>{
+                    redisQ.push(process.env.AUTO_CULL_QUEUE, {
+                        roomId,
+                        shouldCull: false,
+                        timestamp: new Date().toISOString(),
+                    })
+                    redisQ.push(process.env.AUTO_SAVE_QUEUE, {
+                        roomId,
+                        timestamp: new Date().toISOString(),
+                    })
+                })
+                res = {
+                    "status": "created",
+                    "roomURL": `${host}/${roomId}`
+                }
             })
         })
-        res = {
-            "status": "created",
-            "roomURL": `${host}/${roomId}`
-        }
     }).catch(function(err) {
         logger.error(`error occurred while creating for room ${roomId} from image ${image} ${err}`)
         res = {
