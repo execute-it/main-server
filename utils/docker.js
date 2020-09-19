@@ -62,6 +62,7 @@ createRoom = async(image, roomId, memLimit, cpuLimit, host, network, homePath) =
             roomId,
             timestamp: new Date().toISOString(),
         })
+        await redisQ.set(roomId, true)
         res = {
             "status": "created",
             "roomURL": `${host}/${roomId}`

@@ -63,3 +63,39 @@ module.exports.exists = async (queue, roomId) => {
         })
     })
 }
+
+module.exports.get = async (key)=>{
+    return new Promise(async (resolve, rej)=>{
+        await redisClient.get(key, (err, data)=>{
+            if(err)
+                rej(err)
+            else {
+                resolve(data)
+            }
+        })
+    })
+}
+
+module.exports.set = async (key, value)=>{
+    return new Promise(async (resolve, rej)=>{
+        await redisClient.set(key, value, (err, data)=>{
+            if(err)
+                rej(err)
+            else {
+                resolve(data)
+            }
+        })
+    })
+}
+
+module.exports.del = async (key)=>{
+    return new Promise(async (resolve, rej)=>{
+        await redisClient.del(key, (err, data)=>{
+            if(err)
+                rej(err)
+            else {
+                resolve(data)
+            }
+        })
+    })
+}
