@@ -122,7 +122,8 @@ function handleSystemMsg(msg, exec, ws) {
             ws.send("")
             break;
         case "resize":
-            exec.resize({w: parseInt(msgJSON.payload.cols), h: parseInt(msgJSON.payload.rows)})
+            if(msgJSON.payload)
+                exec.resize({w: parseInt(msgJSON.payload.cols), h: parseInt(msgJSON.payload.rows)})
             break;
     }
 }
