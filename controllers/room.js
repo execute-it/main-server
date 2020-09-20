@@ -106,7 +106,6 @@ const getRooms = async(req, res) => {
                     roomURL: x.roomURL,
                     isHost: false,
                     roomId: x._id
-
                 })
             })
         }).then(() => {
