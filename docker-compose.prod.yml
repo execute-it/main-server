@@ -1,4 +1,5 @@
 version: "3"
+
 services:
   reverse-proxy:
     image: traefik:v2.2
@@ -12,6 +13,12 @@ services:
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  redis:
+    image: redis
+    networks:
+      - executeit
+
   app:
     build:
       context: .
@@ -44,7 +51,11 @@ services:
       - OT_SERVER_URL=https://ot.executeit.ml/api/rest
       - FRONTEND_REDIRECT_URL=https://executeit.ml/callback
       - AUTH_SERVER_URL=https://api.executeit.ml/auth
-
+      - USER_DATA_BASE_PATH=${USER_DATA_PATH} # without trailing /
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AUTO_CULL_QUEUE=auto-cull-queue
+      - AUTO_SAVE_QUEUE=auto-save-queue
 
     labels:
       - "traefik.http.routers.app.rule=Host(`api.executeit.ml`)"
@@ -59,16 +70,62 @@ services:
     volumes:
       - ./mongo-volume:/data/db
 
+  mongo-express:
+    image: mongo-express
+    restart: always
+    networks:
+      - executeit
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+
   ot-server:
     image: convergencelabs/convergence-omnibus
     networks:
       - executeit
+    environment:
+      CONVERGENCE_ADMIN_USERNAME: ${CONVERGENCE_USERNAME}
+      CONVERGENCE_ADMIN_PASSWORD: ${CONVERGENCE_PASSWORD}
     volumes:
       - ./ot-volume:/orientdb/databases
     ports:
       - "80"
     labels:
       - "traefik.http.routers.ot-server.rule=Host(`ot.executeit.ml`)"
+
+  auto-save-cull:
+    image: pnshiralkar/execute-it-auto-save-cull
+    depends_on:
+      - ot-server
+    environment:
+      CONVERGENCE_USERNAME: ${CONVERGENCE_USERNAME}
+      CONVERGENCE_PASSWORD: ${CONVERGENCE_PASSWORD}
+      OT_SERVER_URL: "http://ot-server/api"
+      USER_DATA_BASE_PATH: "/worker/data" # Path inside container
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      AUTOSAVE_INTERVAL: 4 # In secs
+      AUTOCULL_INTERVAL: 10 # In secs (60*5)
+      DOCKER_SOCKET: "/var/run/docker.sock"
+      AUTO_CULL_QUEUE: "auto-cull-queue"
+      AUTO_SAVE_QUEUE: "auto-save-queue"
+    command: "./wait-for-it.sh ot-server:80 -q -- node app"
+    networks:
+      - executeit
+    volumes:
+      - ${USER_DATA_PATH}:/worker/data
+      - /var/run/docker.sock:/var/run/docker.sock
+
+# ...
+#  whoami:
+# A container that exposes an API to show its IP address
+#   image: containous/whoami
+#  ports:
+#   - "80"
+#   labels:
+#      - "traefik.http.routers.whoami.rule=Host(`rooms.executeit.ml`)"
 
 networks:
   executeit:

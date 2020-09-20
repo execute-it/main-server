@@ -54,7 +54,7 @@ services:
       - OT_SERVER_URL=http://ot-server/api/rest
       - FRONTEND_REDIRECT_URL=http://localhost:3000/callback
       - AUTH_SERVER_URL=http://localhost/auth
-      - USER_DATA_BASE_PATH=/home/pnshiralkar/execute-it-user-data # without trailing /
+      - USER_DATA_BASE_PATH=${USER_DATA_PATH} # without trailing /
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - AUTO_CULL_QUEUE=auto-cull-queue
@@ -86,6 +86,9 @@ services:
     image: convergencelabs/convergence-omnibus
     networks:
       - executeit
+    environment:
+      CONVERGENCE_ADMIN_USERNAME: ${CONVERGENCE_USERNAME}
+      CONVERGENCE_ADMIN_PASSWORD: ${CONVERGENCE_PASSWORD}
     ports:
       - "80"
     labels:
@@ -105,11 +108,13 @@ services:
       AUTOSAVE_INTERVAL: 4 # In secs
       AUTOCULL_INTERVAL: 10 # In secs (60*5)
       DOCKER_SOCKET: "/var/run/docker.sock"
+      AUTO_CULL_QUEUE: "auto-cull-queue"
+      AUTO_SAVE_QUEUE: "auto-save-queue"
     command: node app
     networks:
       - executeit
     volumes:
-      - /home/pnshiralkar/execute-it-user-data:/worker/data
+      - ${USER_DATA_PATH}:/worker/data
       - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
