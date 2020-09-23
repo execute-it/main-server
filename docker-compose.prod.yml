@@ -59,6 +59,7 @@ services:
 
     labels:
       - "traefik.http.routers.app.rule=Host(`api.executeit.ml`)"
+      - "traefik.http.routers.portfwdauth.rule=Host(`rooms.executeit.ml`)&&Path(`/port-fwd-auth`)"
   mongo:
     image: mongo
     restart: always
