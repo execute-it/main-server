@@ -62,6 +62,7 @@ services:
 
     labels:
       - "traefik.http.routers.app.rule=Host(`localhost`)"
+      - "traefik.http.routers.portfwdauth.rule=Host(`rooms.localhost`)&&Path(`/port-fwd-auth`)"
   mongo:
     image: mongo
     restart: always
@@ -95,7 +96,7 @@ services:
       - "traefik.http.routers.ot-server.rule=Host(`ot.localhost`)"
 
   auto-save-cull:
-    image: auto-save-cull
+    image: pnshiralkar/execute-it-auto-save-cull
     depends_on:
       - ot-server
     environment:
@@ -110,7 +111,7 @@ services:
       DOCKER_SOCKET: "/var/run/docker.sock"
       AUTO_CULL_QUEUE: "auto-cull-queue"
       AUTO_SAVE_QUEUE: "auto-save-queue"
-    command: node app
+    command: "./wait-for-it.sh ot-server:80 -q -- node app"
     networks:
       - executeit
     volumes:
