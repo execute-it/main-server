@@ -1,0 +1,14 @@
+http:
+  routers:
+    # Router for mediasoup (for voice chat)
+    mediasoup-router:
+      # Change to a different subdomain and remove path later
+      rule: "Host(`ot.executeit.ml`) && Path(`/socket.io/`)"
+      service: mediasoup
+  services:
+    # Service for mediasoup (for voice chat)
+    mediasoup:
+      loadBalancer:
+        servers:
+          # 172.17.0.1 is IP of the host
+          - url: "http://172.17.0.1:8000"
