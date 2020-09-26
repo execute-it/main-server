@@ -3,7 +3,7 @@ http:
     # Router for mediasoup (for voice chat)
     mediasoup-router:
       # Change to a different subdomain and remove path later
-      rule: "Host(`ot.executeit.ml`) && Path(`/socket.io/`)"
+      rule: "Host(`voice.executeit.ml`)"
       service: mediasoup
   services:
     # Service for mediasoup (for voice chat)

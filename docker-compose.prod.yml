@@ -120,6 +120,14 @@ services:
       - ${USER_DATA_PATH}:/worker/data
       - /var/run/docker.sock:/var/run/docker.sock
 
+  mediasoup-server:
+    image: pnshiralkar/execute-it-ms
+    environment:
+      SERVER_PORT: 8000 # Ensure this is the same in ./traefik.yml file (for reverse proxy)
+      RTC_IP: 128.199.29.204
+      RTC_ANNOUNCED_IP: 128.199.29.204
+    network_mode: host
+
 # ...
 #  whoami:
 # A container that exposes an API to show its IP address
