@@ -1,47 +1,51 @@
 {
-  "name": "main-server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "dev": "nodemon utils/app.js | pino-colada",
-    "pretest": "eslint --ignore-path .gitignore ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/execute-it/main-server.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/execute-it/main-server/issues"
-  },
-  "homepage": "https://github.com/execute-it/main-server#readme",
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "compression": "^1.7.4",
-    "cookie-parser": "^1.4.5",
-    "cors": "^2.8.5",
-    "dockerode": "^3.2.1",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "express-pino-logger": "^5.0.0",
-    "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.10.2",
-    "passport": "^0.4.1",
-    "passport-google-oauth20": "^2.0.0",
-    "passport-jwt": "^4.0.0",
-    "pino": "^6.5.1",
-    "pino-colada": "^2.1.0",
-    "pm2": "^4.4.1",
-    "uuid": "^8.3.0",
-    "validator": "^13.1.1"
-  },
-  "devDependencies": {
-    "eslint": "^7.7.0",
-    "eslint-config-strongloop": "^2.1.0",
-    "nodemon": "^2.0.4"
-  }
+    "name": "main-server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node app.js",
+        "dev": "nodemon app.js | pino-colada",
+        "pretest": "eslint --ignore-path .gitignore ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/execute-it/main-server.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/execute-it/main-server/issues"
+    },
+    "homepage": "https://github.com/execute-it/main-server#readme",
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "compression": "^1.7.4",
+        "cookie-parser": "^1.4.5",
+        "cors": "^2.8.5",
+        "dockerode": "^3.2.1",
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "express-pino-logger": "^5.0.0",
+        "express-ws": "^4.0.0",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "^5.10.2",
+        "passport": "^0.4.1",
+        "passport-google-oauth20": "^2.0.0",
+        "passport-jwt": "^4.0.0",
+        "pino": "^6.5.1",
+        "pino-colada": "^2.1.0",
+        "pm2": "^4.4.1",
+        "uuid": "^8.3.0",
+        "validator": "^13.1.1",
+        "websocket": "^1.0.32",
+        "redis": "^3.0.2",
+        "ws": "^7.3.1"
+    },
+    "devDependencies": {
+        "eslint": "^7.7.0",
+        "eslint-config-strongloop": "^2.1.0",
+        "nodemon": "^2.0.4"
+    }
 }

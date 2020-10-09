@@ -1,4 +1,5 @@
 version: "3"
+
 services:
   reverse-proxy:
     image: traefik:v2.2
@@ -12,6 +13,14 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  redis:
+    image: redis
+    ports:
+    - 6379:6379
+    networks:
+      - executeit
+
   app:
     build:
       context: .
@@ -30,7 +39,7 @@ services:
       - PORT=5000
       - DOCKER_SOCKET=/var/run/docker.sock
       - USER_SERVER_URL=rooms.localhost
-      - USER_SERVER_IMAGE=user-image-1
+      - USER_SERVER_IMAGE=user-image
       - USER_SERVER_CPU_LIMIT=10
       - USER_SERVER_MEM_LIMIT=256000
       - USER_SERVER_NETWORK=executeit
@@ -45,9 +54,15 @@ services:
       - OT_SERVER_URL=http://ot-server/api/rest
       - FRONTEND_REDIRECT_URL=http://localhost:3000/callback
       - AUTH_SERVER_URL=http://localhost/auth
+      - USER_DATA_BASE_PATH=${USER_DATA_PATH} # without trailing /
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AUTO_CULL_QUEUE=auto-cull-queue
+      - AUTO_SAVE_QUEUE=auto-save-queue
 
     labels:
       - "traefik.http.routers.app.rule=Host(`localhost`)"
+      - "traefik.http.routers.portfwdauth.rule=Host(`rooms.localhost`)&&Path(`/port-fwd-auth`)"
   mongo:
     image: mongo
     restart: always
@@ -72,10 +87,36 @@ services:
     image: convergencelabs/convergence-omnibus
     networks:
       - executeit
+    environment:
+      CONVERGENCE_ADMIN_USERNAME: ${CONVERGENCE_USERNAME}
+      CONVERGENCE_ADMIN_PASSWORD: ${CONVERGENCE_PASSWORD}
     ports:
       - "80"
     labels:
       - "traefik.http.routers.ot-server.rule=Host(`ot.localhost`)"
+
+  auto-save-cull:
+    image: pnshiralkar/execute-it-auto-save-cull
+    depends_on:
+      - ot-server
+    environment:
+      CONVERGENCE_USERNAME: ${CONVERGENCE_USERNAME}
+      CONVERGENCE_PASSWORD: ${CONVERGENCE_PASSWORD}
+      OT_SERVER_URL: "http://ot-server/api"
+      USER_DATA_BASE_PATH: "/worker/data" # Path inside container
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      AUTOSAVE_INTERVAL: 4 # In secs
+      AUTOCULL_INTERVAL: 10 # In secs (60*5)
+      DOCKER_SOCKET: "/var/run/docker.sock"
+      AUTO_CULL_QUEUE: "auto-cull-queue"
+      AUTO_SAVE_QUEUE: "auto-save-queue"
+    command: "./wait-for-it.sh ot-server:80 -q -- node app"
+    networks:
+      - executeit
+    volumes:
+      - ${USER_DATA_PATH}:/worker/data
+      - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
   executeit:
