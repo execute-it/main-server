@@ -3,19 +3,52 @@ const router = express.Router()
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const querystring = require('querystring');
-const { User } = require('../models/User')
+const {User} = require('../models/User')
 const Room = require('../models/Room');
-const { jwtAuth } = require('../middlewares/auth');
+const {jwtAuth} = require('../middlewares/auth');
+const fs = require('fs')
+const secretOrKey = fs.readFileSync(`${__dirname}/../configs/private.key`);
 
-router.get('/', async(req, res) => {
+const ISSUER = 'ConvergenceJwtGenerator';
+const AUDIENCE = 'Convergence';
+const ALGORITHM = 'RS256';
+
+function generate(username, claims,keyId) {
+    if (!claims) {
+        claims = {};
+    }
+    const reserved = ['aud', 'iat', 'sub', 'jti', 'nbf', 'exp'];
+
+    const options = {
+        algorithm: ALGORITHM,
+        audience: AUDIENCE,
+        issuer: ISSUER,
+        expiresIn: '1d',
+        subject: username,
+        header: {
+            kid: keyId
+        }
+    };
+
+    for (let prop in Object.getOwnPropertyNames(claims)) {
+        if (reserved.indexOf(prop) >= 0) {
+            throw new Error('The claim name ' + prop + ' is reserved.');
+        }
+    }
+    console.log(secretOrKey,options)
+
+    return jwt.sign(claims, secretOrKey, options);
+}
+
+router.get('/', async (req, res) => {
     try {
         const requestURI = req.headers['x-forwarded-uri']
         const roomId = req.headers['x-forwarded-prefix'] ? req.headers['x-forwarded-prefix'].split('/')[1] : querystring.parse(requestURI.split('?')[1]).roomId
         const token = querystring.parse(requestURI.split('?')[1]).token || req.cookies['token']
-        const email = jwt.verify(token, process.env.JWT_SECRET).data.email
+        const email = jwt.verify(token, secretOrKey, {algorithms: ['RS256']}).data.email
 
-        const user = await User.findOne({ email: email })
-        const room = await Room.findOne({ _id: roomId })
+        const user = await User.findOne({email: email})
+        const room = await Room.findOne({_id: roomId})
         const userId = user._id
 
         //check id user is host
@@ -25,7 +58,7 @@ router.get('/', async(req, res) => {
 
         //check if user is participant
         if (room.participants.indexOf(userId) > -1) {
-            return res.status(200).send({ status: 'go ahead comrade' })
+            return res.status(200).send({status: 'go ahead comrade'})
         }
 
         return res.status(401).send('Unauthorised')
@@ -62,14 +95,31 @@ router.get(
     (req, res) => {
         let user = {
             displayName: req.user.displayName,
-            name: req.user.firstName,
+            // name: req.user.firstName,
             email: req.user.email,
-            image: req.user.image
+            // image: req.user.image,
+            firstName: req.user.firstName,
+            lastName: req.user.lastName
         }
 
-        let token = jwt.sign({
-            data: user
-        }, process.env.JWT_SECRET, { expiresIn: '1d' })
+        // let token = jwt.sign({
+        //     data: user
+        // }, secretOrKey, { expiresIn: '1d' })
+
+        const keyId = "my-convergence-key";
+
+        // const gen = new generate(keyId, secretOrKey);
+
+        // Provide optional information about the uers.
+        const claims = user;
+
+        // Provide the username
+        const username = req.user.email;
+
+        // Generate the token
+        var token = generate(username, claims,keyId);
+        console.log(token)
+
         res.redirect(`${process.env.FRONTEND_REDIRECT_URL}?token=${token}`)
     }
 )

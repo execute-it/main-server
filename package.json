@@ -20,6 +20,7 @@
     },
     "homepage": "https://github.com/execute-it/main-server#readme",
     "dependencies": {
+        "@convergence/jwt-util": "^0.1.8",
         "body-parser": "^1.19.0",
         "compression": "^1.7.4",
         "cookie-parser": "^1.4.5",
@@ -37,10 +38,10 @@
         "pino": "^6.5.1",
         "pino-colada": "^2.1.0",
         "pm2": "^4.4.1",
+        "redis": "^3.0.2",
         "uuid": "^8.3.0",
         "validator": "^13.1.1",
         "websocket": "^1.0.32",
-        "redis": "^3.0.2",
         "ws": "^7.3.1"
     },
     "devDependencies": {
