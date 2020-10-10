@@ -10,7 +10,7 @@ const { jwtAuth } = require('../middlewares/auth');
 router.get('/', async(req, res) => {
     try {
         const requestURI = req.headers['x-forwarded-uri']
-        const roomId = req.headers['x-forwarded-prefix'].split('/')[1]
+        const roomId = req.headers['x-forwarded-prefix'] ? req.headers['x-forwarded-prefix'].split('/')[1] : querystring.parse(requestURI.split('?')[1]).roomId
         const token = querystring.parse(requestURI.split('?')[1]).token || req.cookies['token']
         const email = jwt.verify(token, process.env.JWT_SECRET).data.email
 

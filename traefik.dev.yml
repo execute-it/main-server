@@ -3,7 +3,7 @@ http:
     # Router for mediasoup (for voice chat)
     mediasoup-router:
       # Change to a different subdomain and remove path later
-      rule: "Host(`voice.executeit.ml`)"
+      rule: "Host(`voice.localhost`)"
       service: mediasoup
       middlewares:
         - mediasoup-auth
@@ -20,5 +20,5 @@ http:
     # Middlewares for mediasoup (for voice chat)
     mediasoup-auth:
       forwardAuth:
-        address: https://api.executeit.ml/auth
+        address: https://localhost/auth
         trustForwardHeader: true

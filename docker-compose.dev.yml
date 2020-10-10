@@ -3,7 +3,7 @@ version: "3"
 services:
   reverse-proxy:
     image: traefik:v2.2
-    command: --api.insecure=true --providers.docker --entryPoints.web.address=:80 --entryPoints.web.forwardedHeaders.insecure
+    command: --api.insecure=true --providers.docker --entryPoints.web.address=:80 --entryPoints.web.forwardedHeaders.insecure --providers.file.filename=/etc/conf.yml
     networks:
       - executeit
     ports:
@@ -12,6 +12,7 @@ services:
       # The Web UI (enabled by --api.insecure=true)
       - "8080:8080"
     volumes:
+      - ./traefik.dev.yml:/etc/conf.yml
       - /var/run/docker.sock:/var/run/docker.sock
 
   redis:
@@ -117,6 +118,14 @@ services:
     volumes:
       - ${USER_DATA_PATH}:/worker/data
       - /var/run/docker.sock:/var/run/docker.sock
+  
+  mediasoup-server:
+    image: pnshiralkar/execute-it-ms
+    environment:
+      SERVER_PORT: 8000 # Ensure this is the same in ./traefik.yml file (for reverse proxy)
+      # RTC_IP: 128.199.29.204
+      # RTC_ANNOUNCED_IP: 128.199.29.204
+    network_mode: host
 
 networks:
   executeit:
