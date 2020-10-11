@@ -10,8 +10,12 @@ const spinDockerContainer = async(req, res) => {
         if (!req.body.roomName) {
             return res.status(400).json({ status: "specify room name" })
         }
-
         const user = await User.findOne({ email: req.user.email })
+
+        //check how rooms has user already started
+        if (await Room.find({ host: user._id, isActive: true }).length >= process.env.MAX_ROOMS_LIMIT)
+            return res.status(400).json({ status: "rooms limit exceeded" })
+
         console.log(user, 'SDDFSFSDFSD')
         const newRoom = {
             roomName: req.body.roomName,
@@ -85,7 +89,7 @@ const getRooms = async(req, res) => {
         let response = []
 
         // rooms where user is admin
-        await Room.find({ host: user._id }, '-host', (err, doc) => {
+        await Room.find({ host: user._id, isActive: true }, '-host', (err, doc) => {
             doc.map((x) => {
                 response.push({
                     roomName: x.roomName,
@@ -98,7 +102,7 @@ const getRooms = async(req, res) => {
         })
 
         //rooms where user is participant
-        await Room.find({ participants: user._id }, '-participants', (err, doc) => {
+        await Room.find({ participants: user._id, isActive: true }, '-participants', (err, doc) => {
             doc.map((x) => {
                 response.push({
                     roomName: x.roomName,
@@ -172,12 +176,12 @@ const getRoomInfo = async(req, res) => {
         const user = await User.findOne({ email: email })
         const userId = user._id
 
-        let room = await Room.findOne({ inviteCode: inviteCode, host: user }).populate('host').populate('participants')
+        let room = await Room.findOne({ inviteCode: inviteCode, host: user, isActive: true }).populate('host').populate('participants')
 
         if (room)
             return res.json(room)
 
-        room = await Room.findOne({ participants: userId, inviteCode: inviteCode }).populate('host').populate('participants')
+        room = await Room.findOne({ participants: userId, inviteCode: inviteCode, isActive: true }).populate('host').populate('participants')
 
         if (room)
             return res.json(room)
@@ -189,14 +193,29 @@ const getRoomInfo = async(req, res) => {
 
     return res.status(400).json({ status: "error" })
 
+}
 
+const deleteRoom = async(req, res) => {
+    const roomId = req.params.roomId
+
+    try {
+        await Room.findOneAndUpdate({ _id: roomId }, { isActive: false })
+        docker.stopAndRemoveContainer(roomId);
+        return res.status(200).json({ status: "room deleted" })
+    } catch {
+        return res.status(400).json({ status: "error" })
+    }
 
 }
+
+
+
 
 module.exports = {
     spinDockerContainer,
     checkRoomName,
     getRooms,
     joinRoom,
-    getRoomInfo
+    getRoomInfo,
+    deleteRoom
 }

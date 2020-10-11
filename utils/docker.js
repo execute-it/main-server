@@ -1,10 +1,10 @@
 const Docker = require('dockerode');
 const logger = require('./logger');
 const redisQ = require('./redisQueue')
+const docker = new Docker({ socketPath: process.env.DOCKER_SOCKET || "/var/run/docker.sock" });
 
 
 createRoom = async(image, roomId, memLimit, cpuLimit, host, network, homePath) => {
-    const docker = new Docker({ socketPath: process.env.DOCKER_SOCKET });
     let auxContainer;
     let res = {};
     logger.info(`creating docker container for room ${roomId} from image ${image}`)
@@ -77,6 +77,29 @@ createRoom = async(image, roomId, memLimit, cpuLimit, host, network, homePath) =
     return res
 }
 
+stopAndRemoveContainer = (containerId) => {
+    const container = docker.getContainer(containerId)
+    return new Promise(((resolve, reject) => {
+        container.stop({}, (err) => {
+            if (err && err.statusCode === 404)
+                reject(JSON.stringify({ code: 404, error: "Container does not exist" }))
+            else if (err)
+                reject(JSON.stringify({ code: 0, error: "Unknown error" }))
+            else {
+                container.remove({}, (err) => {
+                    if (err && err.statusCode === 404)
+                        reject(JSON.stringify({ code: 404, error: "Container does not exist" }))
+                    else if (err)
+                        reject(JSON.stringify({ code: 0, error: "Unknown error" }))
+                    else
+                        resolve()
+
+                })
+            }
+        })
+    }))
+}
+
 // createRoom('pratik', 'cvbn', '', '', 'localhost', 'executeit', '/home/userdata/room2243')
 
-exports.createRoom = createRoom
+module.exports = { createRoom, stopAndRemoveContainer }

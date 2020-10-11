@@ -61,6 +61,7 @@ services:
       - REDIS_PORT=6379
       - AUTO_CULL_QUEUE=auto-cull-queue
       - AUTO_SAVE_QUEUE=auto-save-queue
+      - MAX_ROOMS_LIMIT=2
 
     labels:
       - "traefik.http.routers.app.rule=Host(`localhost`)"

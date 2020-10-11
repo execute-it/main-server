@@ -23,13 +23,14 @@ let RoomSchema = new mongoose.Schema({
     },
     inviteCode: {
         type: String,
-        default: function () {
+        default: function() {
             return uuidv4()
         },
         unique: true
     },
     host: {
-        type: mongoose.Schema.Types.ObjectId, ref: 'User',
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
     },
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -39,6 +40,10 @@ let RoomSchema = new mongoose.Schema({
     },
     roomURL: {
         type: String
+    },
+    isActive: {
+        type: Boolean,
+        default: true
     }
 })
 
