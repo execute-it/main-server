@@ -41,8 +41,9 @@ services:
       - DOCKER_SOCKET=/var/run/docker.sock
       - USER_SERVER_URL=rooms.localhost
       - USER_SERVER_IMAGE=user-image
-      - USER_SERVER_CPU_LIMIT=10
       - USER_SERVER_MEM_LIMIT=268435456
+      - USER_SERVER_CPU_PERIOD=100000
+      - USER_SERVER_CPU_QUOTA=50000
       - USER_SERVER_NETWORK=executeit
       - MONGO_HOST=mongo
       - MONGO_DB_NAME=executeit

@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser')
 var compression = require('compression')
 var cors = require('cors')
 const querystring = require('querystring');
+const corsOptions = require('./configs/cors')
 
 require('./configs/db.js')
 require('./configs/passport')(passport)
@@ -16,7 +17,7 @@ const port = parseInt(process.env.PORT)
 const app = express()
 
 //DISABLE THIS FOR PROD
-app.use(cors())
+app.use(cors(corsOptions))
 
 app.use(compression())
 app.use(expressLogger);

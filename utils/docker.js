@@ -28,9 +28,9 @@ createRoom = async(image, roomId, memLimit, cpuLimit, host, network, homePath) =
             OpenStdin: false,
             StdinOnce: false,
             HostConfig: {
-                "Memory": 26435456,
-                "CpuPeriod": 100000,
-                "CpuQuota": 50000
+                "Memory": parseInt(process.env.USER_SERVER_MEM_LIMIT),
+                "CpuPeriod": parseInt(process.env.USER_SERVER_CPU_PERIOD),
+                "CpuQuota": parseInt(process.env.USER_SERVER_CPU_QUOTA)
             },
             NetworkingConfig: {
                 EndpointsConfig: {
