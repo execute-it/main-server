@@ -4,7 +4,7 @@ const { User } = require('../models/User')
 const logger = require('../utils/logger')
 const JwtStrategy = require('passport-jwt').Strategy
 const { verifyUser } = require('../middlewares/auth')
-
+const fs = require('fs')
 let opts = {}
 opts.jwtFromRequest = function(req) {
     let token = null;
@@ -12,16 +12,18 @@ opts.jwtFromRequest = function(req) {
         console.log(req.headers)
         token = req.headers['x-api-key']
     }
-    return token;
+    return token
 };
-opts.secretOrKey = process.env.JWT_SECRET;
+opts.secretOrKey = fs.readFileSync(`${__dirname}/private.key`);
+opts.algorithms = ['RS256']
 
 module.exports = function(passport) {
     passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
         console.log("JWT BASED  VALIDATION GETTING CALLED")
         console.log("JWT", jwt_payload)
-        if (verifyUser(jwt_payload.data)) {
-            return done(null, jwt_payload.data)
+
+        if (verifyUser(jwt_payload)) {
+            return done(null, jwt_payload)
         } else {
             // user account doesnt exists in the DATA
             return done(null, false);

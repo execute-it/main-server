@@ -105,3 +105,4 @@ dist
 /.env.prod
 .idea
 test
+configs/private.key
