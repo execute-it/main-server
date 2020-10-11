@@ -49,7 +49,7 @@ createRoom = async(image, roomId, memLimit, cpuLimit, host, network, homePath) =
         await auxContainer.start();
 
         logger.info(`Setting up user directory for room ${roomId}`)
-        const exec = await auxContainer.exec({Cmd: "/bin/bash /home/setup.sh".split(' ')})
+        const exec = await auxContainer.exec({ Cmd: "/bin/bash /home/setup.sh".split(' ') })
         await exec.start({})
         logger.info(`Docker container ready for room ${roomId}`)
         await redisQ.connect()
@@ -67,7 +67,7 @@ createRoom = async(image, roomId, memLimit, cpuLimit, host, network, homePath) =
             "status": "created",
             "roomURL": `${host}/${roomId}`
         }
-    }catch(err) {
+    } catch (err) {
         logger.error(`error occurred while creating for room ${roomId} from image ${image} ${err}`)
         res = {
             "status": "error"
