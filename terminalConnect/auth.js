@@ -7,7 +7,7 @@ const secretOrKey = fs.readFileSync(`${__dirname}/../configs/private.key`);
 
 module.exports = async(queryParams) => {
     try {
-        const email = jwt.verify(queryParams.token, secretOrKey, { algorithms: ['RS256'] }).data.email
+        const email = jwt.verify(queryParams.token, secretOrKey, { algorithms: ['RS256'] }).email
 
         const user = await User.findOne({ email: email })
         const room = await Room.findOne({ _id: queryParams.roomId })

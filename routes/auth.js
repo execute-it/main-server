@@ -41,11 +41,12 @@ function generate(username, claims,keyId) {
 }
 
 router.get('/', async (req, res) => {
+    console.log(req.headers)
     try {
         const requestURI = req.headers['x-forwarded-uri']
         const roomId = req.headers['x-forwarded-prefix'] ? req.headers['x-forwarded-prefix'].split('/')[1] : querystring.parse(requestURI.split('?')[1]).roomId
         const token = querystring.parse(requestURI.split('?')[1]).token || req.cookies['token']
-        const email = jwt.verify(token, secretOrKey, {algorithms: ['RS256']}).data.email
+        const email = jwt.verify(token, secretOrKey, {algorithms: ['RS256']}).email
 
         const user = await User.findOne({email: email})
         const room = await Room.findOne({_id: roomId})
@@ -94,7 +95,7 @@ router.get(
         }),
     (req, res) => {
         let user = {
-            displayName: req.user.displayName,
+            displayName: JSON.stringify(req.user),
             // name: req.user.firstName,
             email: req.user.email,
             // image: req.user.image,

@@ -95,6 +95,9 @@ services:
       - "80"
     labels:
       - "traefik.http.routers.ot-server.rule=Host(`ot.localhost`)"
+      - "traefik.http.middlewares.ot-server-auth.forwardauth.address=http://localhost/auth"
+      - "traefik.http.middlewares.ot-server-auth.forwardauth.trustForwardHeader=true"
+      - "traefik.http.routers.ot-server.middlewares=ot-server-auth"
 
   # auto-save-cull:
   #   image: docker.pkg.github.com/execute-it/auto-save-cull/auto-save-cull
