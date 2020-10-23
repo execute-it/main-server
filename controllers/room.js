@@ -202,7 +202,7 @@ const deleteRoom = async(req, res) => {
         await Room.findOneAndUpdate({ _id: roomId }, { isActive: false })
         docker.stopAndRemoveContainer(roomId);
         return res.status(200).json({ status: "room deleted" })
-    } catch {
+    } catch (e) {
         return res.status(400).json({ status: "error" })
     }
 
