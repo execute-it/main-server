@@ -23,7 +23,7 @@ function generate(username, claims, keyId) {
         algorithm: ALGORITHM,
         audience: AUDIENCE,
         issuer: ISSUER,
-        expiresIn: '100d',
+        expiresIn: '1d',
         subject: username,
         header: {
             kid: keyId
