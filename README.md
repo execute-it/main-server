@@ -13,11 +13,19 @@ instructions refer: https://docs.docker.com/install/
 ## Starting the Server
 
 Before starting docker-compose, create a docker bridge network
-``` docker network create -d bridge executeit```
+```bash 
+docker network create -d bridge executeit
+```
 
-Then start traefik `docker-compose -f docker-compose.dev.yml up -d reverse-proxy`
+Then start traefik 
+```bash
+docker-compose -f docker-compose.dev.yml up -d reverse-proxy
+```
 
-And finally start the server `docker-compose -f docker-compose.dev.yml up app`
+And finally start the server 
+```bash
+docker-compose -f docker-compose.dev.yml up app
+```
 
 ## System Architecture
 
